@@ -8,6 +8,10 @@ author:              Alexander Thiemann
 maintainer:          mail@athiemann.net
 copyright:           2016 Alexander Thiemann <mail@athiemann.net>
 category:            Web
+extra-source-files:
+  - README.md
+  - package.yaml
+  - stack.yaml
 
 dependencies:
   - base >= 4.7 && < 5
