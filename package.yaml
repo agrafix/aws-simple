@@ -1,0 +1,29 @@
+name:                aws-simple
+version:             0.1.0.0
+synopsis:            Dead simple bindings to commonly used AWS Services
+description:         Please see README.md
+homepage:            https://github.com/agrafix/aws-simple#readme
+license:             MIT
+author:              Alexander Thiemann
+maintainer:          mail@athiemann.net
+copyright:           2016 Alexander Thiemann <mail@athiemann.net>
+category:            Web
+
+dependencies:
+  - base >= 4.7 && < 5
+  - text
+  - bytestring
+  - mtl
+  - resourcet
+  - lens
+  - conduit
+  - amazonka
+  - amazonka-core
+  - amazonka-s3
+  - amazonka-sqs
+  - blaze-builder
+
+library:
+  source-dirs: src
+  exposed-modules:
+    - Network.AWS.Simple
