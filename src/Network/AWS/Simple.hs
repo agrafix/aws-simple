@@ -6,6 +6,7 @@ module Network.AWS.Simple
          -- * S3
        , AWSFileReadability(..)
        , s3Upload, s3Download, s3Delete, s3CopyInBucket
+       , s3MetaData
          -- * SQS
        , sqsGetQueue, AWSQueue
        , sqsSendMessage
@@ -22,6 +23,7 @@ import Data.Conduit
 import Data.Int
 import Data.Maybe
 import Data.Monoid
+import Data.HashMap.Strict (HashMap)
 import qualified Blaze.ByteString.Builder as BSB
 import qualified Data.ByteString as BS
 import qualified Data.Text as T
@@ -58,18 +60,33 @@ data AWSFileReadability
     | AWSFilePrivate
     deriving (Show, Eq, Enum, Bounded)
 
+s3MetaData ::
+    AWSHandle
+    -> T.Text
+    -> T.Text
+    -> IO (HashMap T.Text T.Text)
+s3MetaData hdl bucket objName =
+    runAWS hdl $
+    do rs <- AWS.send ho
+       pure $ view S3.horsMetadata rs
+    where
+      ho = S3.headObject (S3.BucketName bucket) (S3.ObjectKey objName)
+
 s3Upload ::
     AWSHandle
     -> AWSFileReadability
+    -> HashMap T.Text T.Text
     -> T.Text
     -> T.Text
     -> Int64
     -> Source (ResourceT IO) BS.ByteString -> IO ()
-s3Upload hdl readability bucket objName size fileSource =
+s3Upload hdl readability metaData bucket objName size fileSource =
     runAWS hdl $
     do contentHash <- lift $ fileSource $$ AWS.sinkSHA256
        let body = AWS.HashedStream contentHash (fromIntegral size) fileSource
-           po = S3.putObject (S3.BucketName bucket) (S3.ObjectKey objName) (AWS.Hashed body)
+           po =
+               (S3.putObject (S3.BucketName bucket) (S3.ObjectKey objName) (AWS.Hashed body))
+               & S3.poMetadata .~ metaData
            poACL =
                case readability of
                  AWSFilePrivate -> po

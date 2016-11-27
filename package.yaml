@@ -1,5 +1,5 @@
 name:                aws-simple
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            Dead simple bindings to commonly used AWS Services
 description:         Please see README.md
 homepage:            https://github.com/agrafix/aws-simple#readme
@@ -26,6 +26,7 @@ dependencies:
   - amazonka-s3
   - amazonka-sqs
   - blaze-builder
+  - unordered-containers
 
 library:
   source-dirs: src
