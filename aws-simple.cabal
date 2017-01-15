@@ -1,16 +1,16 @@
--- This file has been generated from package.yaml by hpack version 0.14.0.
+-- This file has been generated from package.yaml by hpack version 0.15.0.
 --
 -- see: https://github.com/sol/hpack
 
 name:           aws-simple
-version:        0.2.0.0
+version:        0.3.0.0
 synopsis:       Dead simple bindings to commonly used AWS Services
-description:    Please see README.md
+description:    Simple bindings to commonly used AWS services
 category:       Web
 homepage:       https://github.com/agrafix/aws-simple#readme
 author:         Alexander Thiemann
 maintainer:     mail@athiemann.net
-copyright:      2016 Alexander Thiemann <mail@athiemann.net>
+copyright:      2016 - 2017 Alexander Thiemann <mail@athiemann.net>
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
@@ -32,7 +32,7 @@ library
     , resourcet
     , lens
     , conduit
-    , amazonka
+    , amazonka >= 1.4.5
     , amazonka-core
     , amazonka-s3
     , amazonka-sqs

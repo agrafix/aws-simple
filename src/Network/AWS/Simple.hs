@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Network.AWS.Simple
        ( connectAWS, AWSHandle
+       , AWS.Region (..)
          -- * Logging
        , AWS.LogLevel (..), LogFun
          -- * S3
@@ -20,10 +21,10 @@ import Control.Monad
 import Control.Monad.Trans
 import Control.Monad.Trans.Resource
 import Data.Conduit
+import Data.HashMap.Strict (HashMap)
 import Data.Int
 import Data.Maybe
 import Data.Monoid
-import Data.HashMap.Strict (HashMap)
 import qualified Blaze.ByteString.Builder as BSB
 import qualified Data.ByteString as BS
 import qualified Data.Text as T
@@ -39,13 +40,13 @@ data AWSHandle =
 
 type LogFun = AWS.LogLevel -> BS.ByteString -> IO ()
 
-connectAWS :: LogFun -> IO AWSHandle
-connectAWS logF =
+connectAWS :: AWS.Region -> LogFun -> IO AWSHandle
+connectAWS reg logF =
     AWSHandle <$> hdl
     where
         hdl =
-            do x <- AWS.newEnv AWS.Frankfurt AWS.Discover
-               pure (x & AWS.envLogger .~ mkLogFun logF)
+            do x <- AWS.newEnv AWS.Discover
+               pure (x & AWS.envLogger .~ mkLogFun logF & AWS.envRegion .~ reg )
 
 mkLogFun :: LogFun -> AWS.Logger
 mkLogFun f ll logBuilder=
