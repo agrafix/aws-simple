@@ -20,4 +20,5 @@ deployment:
     tag: /hackage-.*/
     owner: agrafix
     commands:
+      - chmod +x upload.sh
       - ./upload.sh
