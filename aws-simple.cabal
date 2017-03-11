@@ -3,7 +3,7 @@
 -- see: https://github.com/sol/hpack
 
 name:           aws-simple
-version:        0.3.0.0
+version:        0.4.0.0
 synopsis:       Dead simple bindings to commonly used AWS Services
 description:    Simple bindings to commonly used AWS services
 category:       Web

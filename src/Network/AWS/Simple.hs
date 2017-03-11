@@ -12,7 +12,7 @@ module Network.AWS.Simple
        , sqsGetQueue, AWSQueue
        , sqsSendMessage
        , sqsGetMessage, GetMessageCfg(..), SqsMessage(..), MessageHandle
-       , sqsAckMessage
+       , sqsAckMessage, sqsChangeMessageTimeout
        )
 where
 
@@ -136,6 +136,7 @@ data GetMessageCfg
    = GetMessageCfg
    { gmc_ackTimeout :: !TimeSpan
      -- ^ how long should the message be hidden from other consumers until 'sqsAckMessage' is called
+     -- maximum: 12 hours
    , gmc_messages :: !Int
      -- ^ how many messages should be pulled at once. Between 1 and 10
    , gmc_waitTime :: !TimeSpan
@@ -173,3 +174,8 @@ sqsAckMessage :: AWSHandle -> AWSQueue -> MessageHandle -> IO ()
 sqsAckMessage hdl (AWSQueue q) (MessageHandle rh) =
     runAWS hdl $
     void $ AWS.send (SQS.deleteMessage q rh)
+
+sqsChangeMessageTimeout :: AWSHandle -> AWSQueue -> MessageHandle -> TimeSpan -> IO ()
+sqsChangeMessageTimeout hdl (AWSQueue q) (MessageHandle rh) t =
+    runAWS hdl $
+    void $ AWS.send $ SQS.changeMessageVisibility q rh (round $ toSeconds t)
