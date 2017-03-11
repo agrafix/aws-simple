@@ -25,7 +25,6 @@ dependencies:
   - amazonka-core
   - amazonka-s3
   - amazonka-sqs
-  - blaze-builder
   - unordered-containers
   - timespan
 

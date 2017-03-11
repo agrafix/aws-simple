@@ -26,8 +26,9 @@ import Data.Int
 import Data.Maybe
 import Data.Monoid
 import Data.Time.TimeSpan
-import qualified Blaze.ByteString.Builder as BSB
 import qualified Data.ByteString as BS
+import qualified Data.ByteString.Builder as BSB
+import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Text as T
 import qualified Network.AWS as AWS
 import qualified Network.AWS.Data.Body as AWS
@@ -51,7 +52,7 @@ connectAWS reg logF =
 
 mkLogFun :: LogFun -> AWS.Logger
 mkLogFun f ll logBuilder=
-    f ll (BSB.toByteString logBuilder)
+    f ll (BSL.toStrict $ BSB.toLazyByteString logBuilder)
 
 runAWS :: AWSHandle -> AWS.AWS a -> IO a
 runAWS aws action =
