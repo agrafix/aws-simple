@@ -38,6 +38,7 @@ library
     , amazonka-sqs
     , blaze-builder
     , unordered-containers
+    , timespan
   exposed-modules:
       Network.AWS.Simple
   other-modules:

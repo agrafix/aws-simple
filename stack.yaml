@@ -9,3 +9,4 @@ extra-deps:
   - amazonka-1.4.5
   - amazonka-s3-1.4.5
   - amazonka-sqs-1.4.5
+  - timespan-0.3.0.0

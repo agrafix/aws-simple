@@ -25,6 +25,7 @@ import Data.HashMap.Strict (HashMap)
 import Data.Int
 import Data.Maybe
 import Data.Monoid
+import Data.Time.TimeSpan
 import qualified Blaze.ByteString.Builder as BSB
 import qualified Data.ByteString as BS
 import qualified Data.Text as T
@@ -132,9 +133,12 @@ sqsSendMessage hdl (AWSQueue q) payload =
 
 data GetMessageCfg
    = GetMessageCfg
-   { gmc_ackTimeout :: !Int
-   , gmc_messages :: !Int -- ^ maximum is 10
-   , gmc_waitTime :: !Int
+   { gmc_ackTimeout :: !TimeSpan
+     -- ^ how long should the message be hidden from other consumers until 'sqsAckMessage' is called
+   , gmc_messages :: !Int
+     -- ^ how many messages should be pulled at once. Between 1 and 10
+   , gmc_waitTime :: !TimeSpan
+     -- ^ how long should one polling request wait for the next message? Between 0 and 20 seconds.
    }
 
 data SqsMessage
@@ -159,8 +163,8 @@ sqsGetMessage hdl (AWSQueue q) gmc =
     do ms <-
            AWS.send $
            SQS.receiveMessage q
-           & SQS.rmWaitTimeSeconds ?~ gmc_waitTime gmc
-           & SQS.rmVisibilityTimeout ?~ gmc_ackTimeout gmc
+           & SQS.rmWaitTimeSeconds ?~ round (toSeconds (gmc_waitTime gmc))
+           & SQS.rmVisibilityTimeout ?~ round (toSeconds (gmc_ackTimeout gmc))
            & SQS.rmMaxNumberOfMessages ?~ gmc_messages gmc
        return (mapMaybe wrapMessage $ ms ^. SQS.rmrsMessages)
 

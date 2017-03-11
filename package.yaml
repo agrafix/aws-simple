@@ -27,6 +27,7 @@ dependencies:
   - amazonka-sqs
   - blaze-builder
   - unordered-containers
+  - timespan
 
 library:
   source-dirs: src
