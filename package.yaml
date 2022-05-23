@@ -1,12 +1,12 @@
 name:                aws-simple
-version:             0.4.0.0
-synopsis:            Dead simple bindings to commonly used AWS Services
+version:             0.5.0.0
+synopsis:            Simple bindings to commonly used AWS Services
 description:         Simple bindings to commonly used AWS services
 homepage:            https://github.com/agrafix/aws-simple#readme
 license:             MIT
 author:              Alexander Thiemann
 maintainer:          mail@athiemann.net
-copyright:           2016 - 2017 Alexander Thiemann <mail@athiemann.net>
+copyright:           2016 - 2022 Alexander Thiemann <mail@athiemann.net>
 category:            Web
 extra-source-files:
   - README.md

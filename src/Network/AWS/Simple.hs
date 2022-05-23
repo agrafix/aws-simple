@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Network.AWS.Simple
-       ( connectAWS, AWSHandle
+       ( connectAWS, fromEnv, AWSHandle
        , AWS.Region (..)
          -- * Logging
        , AWS.LogLevel (..), LogFun
@@ -24,7 +24,6 @@ import Data.Conduit
 import Data.HashMap.Strict (HashMap)
 import Data.Int
 import Data.Maybe
-import Data.Monoid
 import Data.Time.TimeSpan
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Builder as BSB
@@ -42,6 +41,9 @@ data AWSHandle =
 
 type LogFun = AWS.LogLevel -> BS.ByteString -> IO ()
 
+fromEnv :: AWS.Env -> AWSHandle
+fromEnv = AWSHandle
+
 connectAWS :: AWS.Region -> LogFun -> IO AWSHandle
 connectAWS reg logF =
     AWSHandle <$> hdl
@@ -51,7 +53,7 @@ connectAWS reg logF =
                pure (x & AWS.envLogger .~ mkLogFun logF & AWS.envRegion .~ reg )
 
 mkLogFun :: LogFun -> AWS.Logger
-mkLogFun f ll logBuilder=
+mkLogFun f ll logBuilder =
     f ll (BSL.toStrict $ BSB.toLazyByteString logBuilder)
 
 runAWS :: AWSHandle -> AWS.AWS a -> IO a
@@ -82,10 +84,10 @@ s3Upload ::
     -> T.Text
     -> T.Text
     -> Int64
-    -> Source (ResourceT IO) BS.ByteString -> IO ()
+    -> ConduitT () BS.ByteString (ResourceT IO) () -> IO ()
 s3Upload hdl readability metaData bucket objName size fileSource =
     runAWS hdl $
-    do contentHash <- lift $ fileSource $$ AWS.sinkSHA256
+    do contentHash <- lift $ runConduit $ fileSource .| AWS.sinkSHA256
        let body = AWS.HashedStream contentHash (fromIntegral size) fileSource
            po =
                (S3.putObject (S3.BucketName bucket) (S3.ObjectKey objName) (AWS.Hashed body))
@@ -99,7 +101,7 @@ s3Upload hdl readability metaData bucket objName size fileSource =
 
 s3Download ::
     AWSHandle -> T.Text -> T.Text
-    -> (ResumableSource (ResourceT IO) BS.ByteString -> ResourceT IO a)
+    -> (ConduitT () BS.ByteString (ResourceT IO) () -> ResourceT IO a)
     -> IO a
 s3Download hdl bucket objName handleOutput =
     runAWS hdl $
